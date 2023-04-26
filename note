@@ -34,8 +34,6 @@ ps：如果 \ 后面跟着的八进制数字超过3个，只有前三个与\构�
 
 
 
-一些足够简单，支持在编译时就得到计算的类型成为“字面值类型”。字面值类型包括算术类型、引用还有指针等等。不过引用还有指针的初始值受到限制。比如指针只能nullptr或0或某个固定地址的对象。
-
 
 
 auto 一般会忽略掉顶层const,同时保留底层const。这意味着把顶层const对象如普通的一个常量，赋值会得到非顶层const的对象，一个变量。如果把控制某一块地方为const的底层const对象赋值，新变量所控制的那块地方仍然不能改变。
@@ -65,8 +63,6 @@ getline(输入流,string对象) 从给定输入流读取字符串，直到遇到
 string.empty()返回是否为空。
 
 string.size()返回string对象中字符的个数。返回类型为string::size_type,一个无符号整型数，它保证它能存放无论字符串多长的字符串。
-
-string 有 == >= > < <= 的比较符
 
 string 可以使用加法。可以加字面量或者是字符常量。但 + 两边至少有一个运算对象是string。
 
@@ -115,10 +111,6 @@ const_iterator像const指针一样，能访问上面的值但是不能改动内�
 
 
 begin 和 end 返回的具体类型由对象是否是常量决定，如果对象是常量，返回 const_iterator ，反之返回 iterator。 有时候我们只想读而不想对数据进行改动，cbegin() 与 cend()只返回 const_iterator 类型。
-
-
-
-两个迭代器之间的距离的类型是 difference_type ，因为这个距离可正可负，所以它是带符号类型的。
 
 
 
@@ -194,3 +186,82 @@ m%(-n) 等于 m%n
 
 
 sizeof(vec)只取决于vector里面存放的数据类型，与元素个数无关。
+
+
+
+
+
+switch 的某一个case初始化了一个变量，如果这个变量后面在switch后面的作用域中还有用到，那么C++不允许跳过这个初始化语句。如果需要为某个 case 分支定义并初始化一个变量，应该把该变量定义在块内，以确保后面所有的case标签都在变量的作用域之外。
+
+
+
+范围 for 语句的定义来源于与之等价的传统 for 语句：
+
+```cpp
+for (auto beg = v.begin(),end = v.end();beg != end;++beg){
+    /*something*/
+}
+```
+
+这解释了为什么在使用范围 for 时，不能添加元素，这会导致原来的 v.end() 失效。
+
+
+
+异常检测，使用throw 表达式表示引发了一个异常。throw 表达式包含关键字 throw 和紧随其后的一个表达式，其中表达式的类型就是抛出的异常类型。
+
+```cpp
+if (item.isbn()!=item2.isbn)
+    throw runtime_error("Data must refer to same ISBN");
+```
+
+这里抛出了一个对象 runtime_error ，它是标准库异常类型的一种，我们用一个字符串作为辅助信息将它初始化了。
+
+
+
+异常处理 try语句块
+
+```cpp
+try{
+    program-statements
+}catch (exception-declaration){
+    handler-statements
+}catch (exception-declaraion){
+    handler-statments
+}
+```
+
+当选中完一个catch语句处理完异常后，会自动跳转到最后一个catch语句的后面。
+
+一个示例代码：
+
+```cpp
+while(cin >> item1 >> item2){
+    try {
+        //执行添加两个 Sales_item 对象的代码
+        //如果添加失败
+        throw runtime_error("failed");
+    }catch (runtime_error err){
+        cout<< err.what() <<endl;
+        char c;
+        cin >> c;
+        if (!cin || c=='n')
+            break;
+    }
+}
+```
+
+如果try一层套一层，那么就会先在抛出异常的那层找相应的catch，没找到就在它的上一层找，知道找到适当类型的catch为止。
+
+如果一直找到最后都没有找到，那么程序会转到名为 terminate 的标准库函数，这会导致当前程序终止。
+
+异常类分别定义在4个头文件中
+
+- exception 头文件定义了最通用的异常类 exception。它只报告异常的产生，不提供额外信息。
+- stdexcept 头文件定义了几种常用的异常类
+- new 头文件定义了bad_alloc 异常类型
+- type_info 头文件定义了 bad_cast 异常类型
+
+![image-20230426192058339](assets/image-20230426192058339.png)
+
+
+
