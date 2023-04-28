@@ -20,8 +20,10 @@ int main(void)
 {
     string s("Hello,World");
     if (find_upper(s))
-        printf("find");
+        printf("find\n");
     else
         cout << "not found" << endl;
+    allToLower(s);
+    cout << s << endl;
     return 0;
 }
